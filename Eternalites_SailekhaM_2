@@ -1,3 +1,5 @@
+Backend:
+
 from flask import Flask, request, jsonify
 from PIL import Image
 import io
@@ -26,3 +28,72 @@ def generate_image():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+
+
+Frontend:
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text-to-Image Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        input[type="text"] {
+            width: 300px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        img {
+            margin-top: 20px;
+            width: 400px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Text-to-Image Generator</h1>
+
+    <form id="text-form">
+        <input type="text" id="text-input" placeholder="Enter a description">
+        <button type="submit">Generate Image</button>
+    </form>
+
+    <div id="result">
+        <img id="generated-image" src="" alt="Generated image will appear here">
+    </div>
+
+    <script>
+        document.getElementById('text-form').addEventListener('submit', async function (event) {
+            event.preventDefault();
+            
+            const text = document.getElementById('text-input').value;
+            const response = await fetch('/generate-image', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ description: text }),
+            });
+
+            const data = await response.json();
+            const image = document.getElementById('generated-image');
+            image.src = 'data:image/png;base64,' + data.image;
+        });
+    </script>
+
+</body>
+</html>
+
