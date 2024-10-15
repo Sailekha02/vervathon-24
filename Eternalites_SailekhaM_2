@@ -1,0 +1,28 @@
+from flask import Flask, request, jsonify
+from PIL import Image
+import io
+import base64
+import torch
+from transformers import pipeline
+
+app = Flask(__name__)
+
+generator = pipeline("text-to-image-generation", model="CompVis/stable-diffusion-v1-4")
+
+@app.route('/generate-image', methods=['POST'])
+def generate_image():
+    data = request.get_json()
+    description = data.get('description')
+
+    result = generator(description)[0]
+
+    image = result['generated_image']
+    image_bytes = io.BytesIO()
+    image.save(image_bytes, format='PNG')
+
+    image_base64 = base64.b64encode(image_bytes.getvalue()).decode('utf-8')
+
+    return jsonify({'image': image_base64})
+
+if __name__ == '__main__':
+    app.run(debug=True)
